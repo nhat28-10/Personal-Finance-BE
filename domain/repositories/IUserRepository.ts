@@ -6,4 +6,5 @@ export interface IUserRepository {
   createUser(user: Omit<Users, "user_id" | "created_at" | "updated_at">):Promise<Users>
   updateUser(user_id: number, user:Partial<Omit<Users, "user_id" | "created_at">>):Promise<Users>
   deleteUser(user_id:number):Promise<boolean>
+  getUserByEmail(email:string):Promise<Users | null>
 }

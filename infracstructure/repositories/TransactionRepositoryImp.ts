@@ -14,20 +14,23 @@ export class TransactionRepositoryImp implements ITransactionRepository {
     return result.rows[0]
   }
   async createTransaction(
-    transaction: Partial<Omit<Transactions, 'transaction_id' | 'wallet_id' | 'created_at' | 'updated_at'>>
-  ): Promise<Transactions> {
-    const query = `INSERT INTO transactions 
-          (category_id, amount, description, transaction_date)
-          VALUES ($1, $2, $3, $4)
-          RETURNING *`
-    const result = await pool.query(query, [
-      transaction.category_id,
-      transaction.amount,
-      transaction.description,
-      transaction.transaction_date
-    ])
-    return result.rows[0]
-  }
+  transaction: Partial<Omit<Transactions, 'transaction_id'>>
+): Promise<Transactions> {
+  const query = `
+    INSERT INTO transactions (wallet_id, category_id, amount, description, transaction_date)
+    VALUES ($1, $2, $3, $4, $5)
+    RETURNING *`;
+    
+  const result = await pool.query(query, [
+    transaction.wallet_id,
+    transaction.category_id,
+    transaction.amount,
+    transaction.description,
+    transaction.transaction_date
+  ]);
+
+  return result.rows[0];
+}
   async updateTransaction(
     transaction_id: number,
     wallet_id: number,

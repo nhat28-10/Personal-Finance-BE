@@ -14,7 +14,7 @@ export class UserRepositoryImp implements IUserRepository {
     return result.rows[0] || null
   }
   async createUser(user: Omit<Users, 'user_id' | 'created_at' | 'updated_at'>): Promise<Users> {
-    const query = `INSERT INTO users (user_name, email, password) VALES ($1,$2,$3) RETURNING *`
+    const query = `INSERT INTO users (user_name, email, password) VALUES ($1,$2,$3) RETURNING *`
     const result = await pool.query(query, [user.user_name, user.email, user.password])
     return result.rows[0]
   }
@@ -23,7 +23,7 @@ export class UserRepositoryImp implements IUserRepository {
     const values = []
     let index = 1
     for (const [key, value] of Object.entries(user)) {
-      fields.push(`${key} == $${index}`)
+      fields.push(`${key} = $${index}`)
       values.push(value)
       index++
     }
@@ -37,5 +37,10 @@ export class UserRepositoryImp implements IUserRepository {
     const query = `DELETE FROM users WHERE user_id = $1`
     const result = await pool.query(query, [user_id])
     return result.rowCount > 0
+  }
+  async getUserByEmail(email: string): Promise<Users | null> {
+      const query = `SELECT * FROM users WHERE email = $1`
+      const result = await pool.query(query, [email])
+      return result.rows[0] || null
   }
 }
