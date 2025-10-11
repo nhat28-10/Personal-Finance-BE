@@ -22,10 +22,8 @@ export class UserService {
   }
   async createUser(user:Omit<Users, 'user_id' | 'created_at' | 'updated_at'>):Promise<Users> {
     // check duplicate email
-    const existingUsers = await this.userRepository.getAllUsers();
-    if(existingUsers.some(u => u.email === user.email)) {
-      throw new Error("Email alreay exist");
-    }
+    const existingUsers = await this.userRepository.getUserByEmail(user.email);
+    if(existingUsers) throw new Error(`Email already used`)
     // hash password before saving
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(user.password, saltRounds)
